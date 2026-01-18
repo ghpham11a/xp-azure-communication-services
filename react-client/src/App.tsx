@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 import { Chat } from './components/Chat/ChatComposite';
 import { Calling, createGroupCallLocator } from './components/Calling/CallingComposite';
@@ -85,12 +85,20 @@ function App() {
     }
   }, [user, threadId]);
 
+  // useEffect(() => {
+  //   setUser({
+  //     identity: { communicationUserId: 'user-id-placeholder' } as CommunicationUserIdentifier,  
+  //     token: "string",
+  //     displayName: "string"
+  //   });
+  // }, []);
+
   if (!user) {
     return (
       <FluentProvider theme={webLightTheme}>
         <div className="app-container">
           <h1>Azure Communication Services</h1>
-          <p>Chat & Video Calls</p>
+          <p>Chat, Voice & Video Calls</p>
 
           {error && <div className="error-message">{error}</div>}
 
@@ -145,7 +153,7 @@ VITE_TOKEN_ENDPOINT=http://localhost:6969/tokens/create`}
           >
             Video Call
           </button>
-        </nav>
+\        </nav>
 
         <main className="main-content">
           {mode === 'chat' && (
