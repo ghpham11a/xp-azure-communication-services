@@ -47,7 +47,7 @@ Uses Azure Communication Services UI Library composites for pre-built communicat
 
 FastAPI application with routers:
 
-- **routers/tokens.py** - `POST /tokens/create` - Creates ACS user identities and issues access tokens
+- **routers/tokens.py** - `POST /tokens/create` - Creates ACS user identities and issues access tokens; `POST /tokens/service-user` - One-time setup to create persistent service user
 - **routers/chat.py** - `POST /chat/thread` - Creates chat threads; `POST /chat/thread/{id}/join` - Adds users to threads
 
 The identity client is initialized at startup using `ACS_CONNECTION_STRING` from environment.
@@ -56,7 +56,8 @@ The identity client is initialized at startup using `ACS_CONNECTION_STRING` from
 
 1. Frontend calls `/tokens/create` to get a new ACS user identity and token
 2. To chat, user either creates a new thread (`/chat/thread`) or joins existing (`/chat/thread/{id}/join`)
-3. User must be a participant in a thread before sending messages
+3. When a thread is created, both the user and the service user are added as participants
+4. The service user can then add new participants when others join via thread ID
 
 ## Configuration
 
@@ -71,7 +72,17 @@ VITE_ACS_PHONE_NUMBER=+1234567890  # Optional, for PSTN
 ```
 ACS_CONNECTION_STRING=endpoint=https://...;accesskey=...
 ACS_ENDPOINT=https://your-resource.communication.azure.com
+ACS_SERVICE_USER_ID=8:acs:...  # See setup below
 ```
+
+### Service User Setup (one-time)
+
+The chat "join" functionality requires a persistent service user that gets added to all threads. This allows anyone with a thread ID to join.
+
+1. Start the server
+2. Run: `curl -X POST http://localhost:6969/tokens/service-user`
+3. Copy the returned `userId` to your `.env` as `ACS_SERVICE_USER_ID`
+4. Restart the server
 
 ## Key Dependencies
 
