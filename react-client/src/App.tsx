@@ -1,0 +1,210 @@
+import { useState, useCallback, useEffect } from 'react';
+import { FluentProvider, webLightTheme } from '@fluentui/react-components';
+import type { CommunicationUserIdentifier } from '@azure/communication-common';
+import { Chat } from './components/Chat/ChatComposite';
+import { Calling, createGroupCallLocator } from './components/Calling/CallingComposite';
+import { PhoneCall } from './components/Calling/PhoneCall';
+import { getAcsToken } from './services/acsService';
+import { validateConfig } from './config/acs.config';
+import type { AcsUser, CommunicationMode } from './types/acs.types';
+import './App.css';
+
+function App() {
+  const [user, setUser] = useState<AcsUser | null>(null);
+  const [displayName, setDisplayName] = useState('');
+  const [mode, setMode] = useState<CommunicationMode>('chat');
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // For chat
+  const [threadId, setThreadId] = useState('');
+
+  // For video/group calls
+  const [groupId, setGroupId] = useState('');
+
+  // For phone calls (your ACS phone number)
+  const alternateCallerId = import.meta.env.VITE_ACS_PHONE_NUMBER || '';
+
+  const connect = useCallback(async () => {
+    if (!displayName.trim()) {
+      setError('Please enter a display name');
+      return;
+    }
+
+    if (!validateConfig()) {
+      setError('ACS is not configured. Please set environment variables.');
+      return;
+    }
+
+    setIsConnecting(true);
+    setError(null);
+
+    try {
+      const acsUser = await getAcsToken(displayName);
+      setUser(acsUser);
+    } catch (err) {
+      setError(`Failed to connect: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsConnecting(false);
+    }
+  }, [displayName]);
+
+  const disconnect = useCallback(() => {
+    setUser(null);
+    setThreadId('');
+    setGroupId('');
+  }, []);
+
+  // useEffect(() => {
+  //   setUser({
+  //     identity: { communicationUserId: 'user-id-placeholder' } as CommunicationUserIdentifier,  
+  //     token: "string",
+  //     displayName: "string"
+  //   });
+  // }, []);
+
+  if (!user) {
+    return (
+      <FluentProvider theme={webLightTheme}>
+        <div className="app-container">
+          <h1>Azure Communication Services</h1>
+          <p>Chat, Voice & Video Calls</p>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <div className="connect-form">
+            <input
+              type="text"
+              placeholder="Enter your display name"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && connect()}
+              disabled={isConnecting}
+            />
+            <button onClick={connect} disabled={isConnecting || !displayName.trim()}>
+              {isConnecting ? 'Connecting...' : 'Connect'}
+            </button>
+          </div>
+
+          <div className="setup-info">
+            <h3>Setup Required</h3>
+            <p>Create a <code>.env</code> file with:</p>
+            <pre>
+{`VITE_ACS_ENDPOINT=https://your-resource.communication.azure.com
+VITE_TOKEN_ENDPOINT=http://localhost:7071/api/token
+VITE_ACS_PHONE_NUMBER=+1234567890  # Optional, for PSTN calls`}
+            </pre>
+          </div>
+        </div>
+      </FluentProvider>
+    );
+  }
+
+  return (
+    <FluentProvider theme={webLightTheme}>
+      <div className="app-container">
+        <header className="app-header">
+          <h1>Azure Communication Services</h1>
+          <div className="user-info">
+            <span>Connected as: {user.displayName}</span>
+            <button onClick={disconnect} className="disconnect-btn">Disconnect</button>
+          </div>
+        </header>
+
+        <nav className="mode-selector">
+          <button
+            className={mode === 'chat' ? 'active' : ''}
+            onClick={() => setMode('chat')}
+          >
+            Chat
+          </button>
+          <button
+            className={mode === 'video' ? 'active' : ''}
+            onClick={() => setMode('video')}
+          >
+            Video Call
+          </button>
+          <button
+            className={mode === 'phone' ? 'active' : ''}
+            onClick={() => setMode('phone')}
+          >
+            Phone Call
+          </button>
+        </nav>
+
+        <main className="main-content">
+          {mode === 'chat' && (
+            <div className="chat-section">
+              <div className="input-group">
+                <input
+                  type="text"
+                  placeholder="Enter Chat Thread ID"
+                  value={threadId}
+                  onChange={(e) => setThreadId(e.target.value)}
+                />
+              </div>
+              {threadId ? (
+                <Chat
+                  token={user.token}
+                  userId={user.identity.communicationUserId}
+                  displayName={user.displayName}
+                  threadId={threadId}
+                />
+              ) : (
+                <p className="hint">Enter a chat thread ID to start chatting</p>
+              )}
+            </div>
+          )}
+
+          {mode === 'video' && (
+            <div className="video-section">
+              <div className="input-group">
+                <input
+                  type="text"
+                  placeholder="Enter Group ID (UUID)"
+                  value={groupId}
+                  onChange={(e) => setGroupId(e.target.value)}
+                />
+                <button onClick={() => setGroupId(crypto.randomUUID())}>
+                  Generate New Group ID
+                </button>
+              </div>
+              {groupId ? (
+                <Calling
+                  token={user.token}
+                  userId={user.identity.communicationUserId}
+                  displayName={user.displayName}
+                  locator={createGroupCallLocator(groupId)}
+                />
+              ) : (
+                <p className="hint">Enter or generate a Group ID to start a video call</p>
+              )}
+            </div>
+          )}
+
+          {mode === 'phone' && (
+            <div className="phone-section">
+              {alternateCallerId ? (
+                <PhoneCall
+                  token={user.token}
+                  displayName={user.displayName}
+                  alternateCallerId={alternateCallerId}
+                />
+              ) : (
+                <div className="warning">
+                  <p>PSTN calling requires configuration:</p>
+                  <ol>
+                    <li>Purchase a phone number in Azure Portal</li>
+                    <li>Set <code>VITE_ACS_PHONE_NUMBER</code> in your .env file</li>
+                  </ol>
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+      </div>
+    </FluentProvider>
+  );
+}
+
+export default App;

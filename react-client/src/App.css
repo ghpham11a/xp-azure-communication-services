@@ -1,0 +1,229 @@
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.app-container h1 {
+  color: #0078d4;
+  margin-bottom: 10px;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.disconnect-btn {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.disconnect-btn:hover {
+  background: #b71c1c;
+}
+
+.connect-form {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.connect-form input {
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 300px;
+}
+
+.connect-form button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.connect-form button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.connect-form button:hover:not(:disabled) {
+  background: #005a9e;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.mode-selector button {
+  padding: 12px 24px;
+  font-size: 14px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-selector button:hover {
+  background: #e0e0e0;
+}
+
+.mode-selector button.active {
+  background: #0078d4;
+  color: white;
+  border-color: #0078d4;
+}
+
+.main-content {
+  min-height: 500px;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.input-group button {
+  padding: 10px 20px;
+  background: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.input-group button:hover {
+  background: #005a9e;
+}
+
+.hint {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  padding: 40px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.warning {
+  background: #fff3e0;
+  color: #e65100;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.warning ol {
+  text-align: left;
+  margin-top: 10px;
+}
+
+.setup-info {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 40px;
+  text-align: left;
+}
+
+.setup-info h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.setup-info pre {
+  background: #263238;
+  color: #aed581;
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 13px;
+}
+
+.setup-info code {
+  background: #e0e0e0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  color: #666;
+  font-size: 16px;
+}
+
+.chat-container,
+.calling-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.phone-call-container {
+  background: #fafafa;
+  border-radius: 8px;
+  max-width: 400px;
+}
+
+.phone-call-container h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.phone-call-container input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.phone-call-container button {
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
