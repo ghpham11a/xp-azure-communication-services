@@ -45,13 +45,15 @@ export async function refreshToken(userId: string): Promise<string> {
   return data.token;
 }
 
-export async function createChatThread(topic: string, participantIds: string[]): Promise<string> {
-  const response = await fetch(`${ACS_CONFIG.tokenEndpoint}/chat/thread`, {
+const CHAT_BASE_URL = 'http://localhost:6969/chat';
+
+export async function createChatThread(userId: string, displayName: string, topic: string = 'Chat'): Promise<string> {
+  const response = await fetch(`${CHAT_BASE_URL}/thread`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ topic, participantIds }),
+    body: JSON.stringify({ userId, displayName, topic }),
   });
 
   if (!response.ok) {
@@ -60,4 +62,18 @@ export async function createChatThread(topic: string, participantIds: string[]):
 
   const data = await response.json();
   return data.threadId;
+}
+
+export async function joinChatThread(threadId: string, userId: string, displayName: string): Promise<void> {
+  const response = await fetch(`${CHAT_BASE_URL}/thread/${threadId}/join`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userId, displayName }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to join chat thread: ${response.statusText}`);
+  }
 }

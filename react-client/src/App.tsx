@@ -4,7 +4,7 @@ import type { CommunicationUserIdentifier } from '@azure/communication-common';
 import { Chat } from './components/Chat/ChatComposite';
 import { Calling, createGroupCallLocator } from './components/Calling/CallingComposite';
 import { PhoneCall } from './components/Calling/PhoneCall';
-import { getAcsToken } from './services/acsService';
+import { getAcsToken, createChatThread, joinChatThread } from './services/acsService';
 import { validateConfig } from './config/acs.config';
 import type { AcsUser, CommunicationMode } from './types/acs.types';
 import './App.css';
@@ -18,6 +18,8 @@ function App() {
 
   // For chat
   const [threadId, setThreadId] = useState('');
+  const [hasJoinedThread, setHasJoinedThread] = useState(false);
+  const [isJoiningThread, setIsJoiningThread] = useState(false);
 
   // For video/group calls
   const [groupId, setGroupId] = useState('');
@@ -53,7 +55,40 @@ function App() {
     setUser(null);
     setThreadId('');
     setGroupId('');
+    setHasJoinedThread(false);
   }, []);
+
+  const handleCreateThread = useCallback(async () => {
+    if (!user) return;
+    setIsJoiningThread(true);
+    setError(null);
+    try {
+      const newThreadId = await createChatThread(
+        user.identity.communicationUserId,
+        user.displayName
+      );
+      setThreadId(newThreadId);
+      setHasJoinedThread(true);
+    } catch (err) {
+      setError(`Failed to create thread: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsJoiningThread(false);
+    }
+  }, [user]);
+
+  const handleJoinThread = useCallback(async () => {
+    if (!user || !threadId.trim()) return;
+    setIsJoiningThread(true);
+    setError(null);
+    try {
+      await joinChatThread(threadId, user.identity.communicationUserId, user.displayName);
+      setHasJoinedThread(true);
+    } catch (err) {
+      setError(`Failed to join thread: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsJoiningThread(false);
+    }
+  }, [user, threadId]);
 
   // useEffect(() => {
   //   setUser({
@@ -135,23 +170,51 @@ VITE_ACS_PHONE_NUMBER=+1234567890  # Optional, for PSTN calls`}
         <main className="main-content">
           {mode === 'chat' && (
             <div className="chat-section">
-              <div className="input-group">
-                <input
-                  type="text"
-                  placeholder="Enter Chat Thread ID"
-                  value={threadId}
-                  onChange={(e) => setThreadId(e.target.value)}
-                />
-              </div>
-              {threadId ? (
-                <Chat
-                  token={user.token}
-                  userId={user.identity.communicationUserId}
-                  displayName={user.displayName}
-                  threadId={threadId}
-                />
+              {error && <div className="error-message">{error}</div>}
+              {!hasJoinedThread ? (
+                <>
+                  <div className="input-group">
+                    <input
+                      type="text"
+                      placeholder="Enter Chat Thread ID to join"
+                      value={threadId}
+                      onChange={(e) => setThreadId(e.target.value)}
+                      disabled={isJoiningThread}
+                    />
+                    <button
+                      onClick={handleJoinThread}
+                      disabled={isJoiningThread || !threadId.trim()}
+                    >
+                      {isJoiningThread ? 'Joining...' : 'Join Thread'}
+                    </button>
+                  </div>
+                  <div className="divider">or</div>
+                  <button
+                    onClick={handleCreateThread}
+                    disabled={isJoiningThread}
+                    className="create-thread-btn"
+                  >
+                    {isJoiningThread ? 'Creating...' : 'Create New Thread'}
+                  </button>
+                </>
               ) : (
-                <p className="hint">Enter a chat thread ID to start chatting</p>
+                <>
+                  <div className="thread-info">
+                    <span>Thread ID: <code>{threadId}</code></span>
+                    <button
+                      onClick={() => { setHasJoinedThread(false); setThreadId(''); }}
+                      className="leave-btn"
+                    >
+                      Leave Thread
+                    </button>
+                  </div>
+                  <Chat
+                    token={user.token}
+                    userId={user.identity.communicationUserId}
+                    displayName={user.displayName}
+                    threadId={threadId}
+                  />
+                </>
               )}
             </div>
           )}

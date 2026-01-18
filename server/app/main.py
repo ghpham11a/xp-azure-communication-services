@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from azure.communication.identity import CommunicationIdentityClient
 
-from routers import tokens
+from routers import tokens, chat
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,6 +19,7 @@ def create_app() -> FastAPI:
     app = FastAPI(lifespan=lifespan)
 
     app.include_router(tokens.router, prefix="/tokens", tags=["tokens"])
+    app.include_router(chat.router, prefix="/chat", tags=["chat"])
 
     @app.get("/")
     def root():
