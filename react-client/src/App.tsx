@@ -1,9 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
-import type { CommunicationUserIdentifier } from '@azure/communication-common';
 import { Chat } from './components/Chat/ChatComposite';
 import { Calling, createGroupCallLocator } from './components/Calling/CallingComposite';
-import { PhoneCall } from './components/Calling/PhoneCall';
 import { getAcsToken, createChatThread, joinChatThread } from './services/acsService';
 import { validateConfig } from './config/acs.config';
 import type { AcsUser, CommunicationMode } from './types/acs.types';
@@ -23,9 +21,6 @@ function App() {
 
   // For video/group calls
   const [groupId, setGroupId] = useState('');
-
-  // For phone calls (your ACS phone number)
-  const alternateCallerId = import.meta.env.VITE_ACS_PHONE_NUMBER || '';
 
   const connect = useCallback(async () => {
     if (!displayName.trim()) {
@@ -90,20 +85,12 @@ function App() {
     }
   }, [user, threadId]);
 
-  // useEffect(() => {
-  //   setUser({
-  //     identity: { communicationUserId: 'user-id-placeholder' } as CommunicationUserIdentifier,  
-  //     token: "string",
-  //     displayName: "string"
-  //   });
-  // }, []);
-
   if (!user) {
     return (
       <FluentProvider theme={webLightTheme}>
         <div className="app-container">
           <h1>Azure Communication Services</h1>
-          <p>Chat, Voice & Video Calls</p>
+          <p>Chat & Video Calls</p>
 
           {error && <div className="error-message">{error}</div>}
 
@@ -126,8 +113,7 @@ function App() {
             <p>Create a <code>.env</code> file with:</p>
             <pre>
 {`VITE_ACS_ENDPOINT=https://your-resource.communication.azure.com
-VITE_TOKEN_ENDPOINT=http://localhost:7071/api/token
-VITE_ACS_PHONE_NUMBER=+1234567890  # Optional, for PSTN calls`}
+VITE_TOKEN_ENDPOINT=http://localhost:6969/tokens/create`}
             </pre>
           </div>
         </div>
@@ -158,12 +144,6 @@ VITE_ACS_PHONE_NUMBER=+1234567890  # Optional, for PSTN calls`}
             onClick={() => setMode('video')}
           >
             Video Call
-          </button>
-          <button
-            className={mode === 'phone' ? 'active' : ''}
-            onClick={() => setMode('phone')}
-          >
-            Phone Call
           </button>
         </nav>
 
@@ -241,26 +221,6 @@ VITE_ACS_PHONE_NUMBER=+1234567890  # Optional, for PSTN calls`}
                 />
               ) : (
                 <p className="hint">Enter or generate a Group ID to start a video call</p>
-              )}
-            </div>
-          )}
-
-          {mode === 'phone' && (
-            <div className="phone-section">
-              {alternateCallerId ? (
-                <PhoneCall
-                  token={user.token}
-                  displayName={user.displayName}
-                  alternateCallerId={alternateCallerId}
-                />
-              ) : (
-                <div className="warning">
-                  <p>PSTN calling requires configuration:</p>
-                  <ol>
-                    <li>Purchase a phone number in Azure Portal</li>
-                    <li>Set <code>VITE_ACS_PHONE_NUMBER</code> in your .env file</li>
-                  </ol>
-                </div>
               )}
             </div>
           )}

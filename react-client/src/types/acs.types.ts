@@ -20,7 +20,6 @@ export interface ChatThreadInfo {
 export interface CallInfo {
   groupId?: string;
   participantIds?: string[];
-  phoneNumber?: string;
 }
 
-export type CommunicationMode = 'chat' | 'call' | 'video' | 'phone';
+export type CommunicationMode = 'chat' | 'video';
