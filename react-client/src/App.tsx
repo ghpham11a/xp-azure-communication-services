@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 import { Chat } from './components/Chat/ChatComposite';
 import { Calling, createGroupCallLocator } from './components/Calling/CallingComposite';
@@ -21,6 +21,12 @@ function App() {
 
   // For video/group calls
   const [groupId, setGroupId] = useState('');
+
+  // Memoize locator to prevent unnecessary adapter recreation
+  const callLocator = useMemo(
+    () => (groupId ? createGroupCallLocator(groupId) : null),
+    [groupId]
+  );
 
   const connect = useCallback(async () => {
     if (!displayName.trim()) {
@@ -220,12 +226,12 @@ VITE_TOKEN_ENDPOINT=http://localhost:6969/tokens/create`}
                   Generate New Group ID
                 </button>
               </div>
-              {groupId ? (
+              {callLocator ? (
                 <Calling
                   token={user.token}
                   userId={user.identity.communicationUserId}
                   displayName={user.displayName}
-                  locator={createGroupCallLocator(groupId)}
+                  locator={callLocator}
                 />
               ) : (
                 <p className="hint">Enter or generate a Group ID to start a video call</p>
