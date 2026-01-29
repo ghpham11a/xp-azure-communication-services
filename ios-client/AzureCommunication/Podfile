@@ -1,0 +1,35 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '17.0'
+
+target 'AzureCommunication' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for AzureCommunication
+  pod 'AzureCommunicationCommon'      # Shared types (CommunicationTokenCredential)
+  pod 'AzureCommunicationChat'        # Chat SDK
+  pod 'AzureCommunicationUICalling'   # Video calling UI composite
+
+  target 'AzureCommunicationTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'AzureCommunicationUITests' do
+    # Pods for testing
+  end
+
+end
+
+post_install do |installer|
+  # Fix Swift 6 compatibility issue in AzureCore
+  request_string_path = "Pods/AzureCore/sdk/core/AzureCore/Source/Util/RequestString.swift"
+  if File.exist?(request_string_path)
+    # Make file writable
+    File.chmod(0644, request_string_path)
+    content = File.read(request_string_path)
+    # Remove the problematic == operator extension
+    patched = content.gsub(/public extension RequestStringConvertible \{\s*static func == \(lhs: RequestStringConvertible, rhs: RequestStringConvertible\) -> Bool \{\s*return lhs\.requestString == rhs\.requestString\s*\}\s*\}/, '')
+    File.write(request_string_path, patched)
+  end
+end

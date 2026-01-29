@@ -10,6 +10,7 @@ Azure Communication Services (ACS) experimentation project with a React frontend
 
 - `react-client/` - Vite + React 18 + TypeScript frontend using ACS UI Library composites
 - `android-client/` - Kotlin + Jetpack Compose Android app using ACS UI SDK
+- `ios-client/` - SwiftUI iOS app using ACS iOS SDK
 - `server/` - FastAPI backend for ACS token and chat operations
 
 ## Commands
@@ -35,6 +36,10 @@ uvicorn main:app --host 0.0.0.0 --port 6969 --reload
 ### Android (android-client/)
 
 Open in Android Studio. Uses Gradle with version catalogs (`gradle/libs.versions.toml`).
+
+### iOS (ios-client/)
+
+Open `AzureCommunication.xcodeproj` in Xcode 15+. Add ACS SDK via Swift Package Manager (see Configuration section).
 
 ### Tunneling for mobile testing
 
@@ -63,6 +68,20 @@ Jetpack Compose with MVVM architecture:
 - **data/api/AcsApiService.kt** - Retrofit service for backend API
 - **data/repository/AcsRepository.kt** - Data layer
 - **config/AcsConfig.kt** - ACS endpoint configuration
+
+### iOS App
+
+SwiftUI with MVVM architecture:
+
+- **AzureCommunicationApp.swift** - Entry point
+- **ContentView.swift** - Root navigation based on state
+- **ViewModels/AcsViewModel.swift** - ObservableObject state management
+- **Views/** - SwiftUI screens: Home, ModeSelection, ChatSetup, Chat, CallSetup, Calling
+- **Data/API/AcsApiService.swift** - URLSession async/await API calls
+- **Data/Repository/AcsRepository.swift** - Data layer
+- **Data/Models/AcsModels.swift** - Codable models
+- **Config/AcsConfig.swift** - ACS endpoint configuration
+- **Utilities/PermissionManager.swift** - Camera/microphone permissions
 
 ### Backend (FastAPI)
 
@@ -96,6 +115,17 @@ ACS_SERVICE_USER_ID=8:acs:...  # See setup below
 ### Android (config/AcsConfig.kt)
 
 Update `ACS_ENDPOINT` constant and backend URL in `NetworkModule.kt`.
+
+### iOS (Config/AcsConfig.swift)
+
+Update `acsEndpoint` and `apiBaseURL` constants.
+
+**Adding ACS SDK via Swift Package Manager:**
+
+1. Open project in Xcode
+2. File → Add Package Dependencies
+3. Add: `https://github.com/Azure/azure-communication-ui-library-ios` (for CallComposite)
+4. Add: `https://github.com/AzureAD/microsoft-authentication-library-for-objc` if needed for auth
 
 ### Service User Setup (one-time)
 
