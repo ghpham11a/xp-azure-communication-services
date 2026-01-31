@@ -39,7 +39,7 @@ Open in Android Studio. Uses Gradle with version catalogs (`gradle/libs.versions
 ### Tunneling for mobile testing
 
 ```bash
-ngrok http --hostname=feedback-test.ngrok.io 6969
+ngrok http --hostname=<your-hostname>.ngrok.io <your-port>
 ```
 
 ## Architecture
