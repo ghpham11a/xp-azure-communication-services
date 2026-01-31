@@ -10,6 +10,7 @@ Azure Communication Services (ACS) experimentation project with a React frontend
 
 - `react-client/` - Vite + React 18 + TypeScript frontend using ACS UI Library composites
 - `android-client/` - Kotlin + Jetpack Compose Android app using ACS UI SDK
+- `ios-client/` - SwiftUI iOS app using ACS iOS SDK
 - `server/` - FastAPI backend for ACS token and chat operations
 
 ## Commands
@@ -35,6 +36,16 @@ uvicorn main:app --host 0.0.0.0 --port 6969 --reload
 ### Android (android-client/)
 
 Open in Android Studio. Uses Gradle with version catalogs (`gradle/libs.versions.toml`).
+
+### iOS (ios-client/)
+
+```bash
+cd ios-client/AzureCommunication
+pod install                    # Install CocoaPods dependencies
+open AzureCommunication.xcworkspace  # Open workspace (NOT .xcodeproj)
+```
+
+Requires Xcode 15+, iOS 17.0+ deployment target. Uses CocoaPods for ACS SDKs.
 
 ### Tunneling for mobile testing
 
@@ -63,6 +74,26 @@ Jetpack Compose with MVVM architecture:
 - **data/api/AcsApiService.kt** - Retrofit service for backend API
 - **data/repository/AcsRepository.kt** - Data layer
 - **config/AcsConfig.kt** - ACS endpoint configuration
+
+### iOS App
+
+SwiftUI with MVVM architecture:
+
+- **AzureCommunicationApp.swift** - Entry point
+- **ContentView.swift** - Root navigation based on state
+- **ViewModels/AcsViewModel.swift** - ObservableObject state management (requires `import Combine`)
+- **Views/** - SwiftUI screens: Home, ModeSelection, ChatSetup, Chat, CallSetup, Calling
+- **Data/API/AcsApiService.swift** - URLSession async/await API calls
+- **Data/Repository/AcsRepository.swift** - Data layer
+- **Data/Models/AcsModels.swift** - Codable models
+- **Config/AcsConfig.swift** - ACS endpoint configuration
+- **Utilities/PermissionManager.swift** - Camera/microphone permissions
+
+**ACS iOS SDK Notes:**
+- Chat SDK uses completion handlers with Swift `Result` types, not async/await
+- Example: `threadClient.send(message: request) { result, _ in switch result { case .success(let r): ... } }`
+- Message types need explicit enum: `ChatMessageType.text` (not `.text`)
+- Podfile includes post_install patch for Swift 6 compatibility with AzureCore
 
 ### Backend (FastAPI)
 
@@ -96,6 +127,10 @@ ACS_SERVICE_USER_ID=8:acs:...  # See setup below
 ### Android (config/AcsConfig.kt)
 
 Update `ACS_ENDPOINT` constant and backend URL in `NetworkModule.kt`.
+
+### iOS (Config/AcsConfig.swift)
+
+Update `acsEndpoint` and `apiBaseURL` constants.
 
 ### Service User Setup (one-time)
 
