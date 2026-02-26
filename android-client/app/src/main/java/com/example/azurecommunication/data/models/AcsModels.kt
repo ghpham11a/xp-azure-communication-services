@@ -1,39 +1,39 @@
 package com.example.azurecommunication.data.models
 
-import kotlinx.serialization.Serializable
+import com.squareup.moshi.JsonClass
 
-@Serializable
+@JsonClass(generateAdapter = true)
 data class TokenRequest(
     val displayName: String = "Anonymous"
 )
 
-@Serializable
+@JsonClass(generateAdapter = true)
 data class TokenResponse(
     val userId: String,
     val token: String,
     val expiresOn: String
 )
 
-@Serializable
+@JsonClass(generateAdapter = true)
 data class CreateThreadRequest(
     val userId: String,
     val displayName: String,
     val topic: String = "Chat"
 )
 
-@Serializable
+@JsonClass(generateAdapter = true)
 data class CreateThreadResponse(
     val threadId: String,
     val topic: String
 )
 
-@Serializable
+@JsonClass(generateAdapter = true)
 data class JoinThreadRequest(
     val userId: String,
     val displayName: String
 )
 
-@Serializable
+@JsonClass(generateAdapter = true)
 data class JoinThreadResponse(
     val success: Boolean,
     val threadId: String,

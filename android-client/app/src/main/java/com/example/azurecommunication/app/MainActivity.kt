@@ -1,4 +1,4 @@
-package com.example.azurecommunication
+package com.example.azurecommunication.app
 
 import android.Manifest
 import android.os.Bundle
@@ -11,17 +11,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.azurecommunication.data.models.CommunicationMode
-import com.example.azurecommunication.ui.screens.CallSetupScreen
-import com.example.azurecommunication.ui.screens.CallingScreen
-import com.example.azurecommunication.ui.screens.ChatScreen
-import com.example.azurecommunication.ui.screens.ChatSetupScreen
-import com.example.azurecommunication.ui.screens.HomeScreen
-import com.example.azurecommunication.ui.screens.ModeSelectionScreen
-import com.example.azurecommunication.ui.theme.AzureCommunicationTheme
-import com.example.azurecommunication.ui.viewmodel.AcsViewModel
+import com.example.azurecommunication.features.callsetup.CallSetupScreen
+import com.example.azurecommunication.features.calling.CallingScreen
+import com.example.azurecommunication.features.chat.ChatScreen
+import com.example.azurecommunication.features.chatsetup.ChatSetupScreen
+import com.example.azurecommunication.features.home.HomeScreen
+import com.example.azurecommunication.features.modeselection.ModeSelectionScreen
+import com.example.azurecommunication.shared.theme.AzureCommunicationTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val requestPermissionsLauncher = registerForActivityResult(
@@ -52,25 +53,26 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AzureCommunicationApp(
-    viewModel: AcsViewModel = viewModel()
+    viewModel: MainViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val user by viewModel.user.collectAsState()
+    val isConnected by viewModel.isConnected.collectAsState()
+    val mode by viewModel.mode.collectAsState()
+    val threadId by viewModel.threadId.collectAsState()
+    val groupId by viewModel.groupId.collectAsState()
 
     when {
         // Not connected - show home screen
-        !uiState.isConnected -> {
+        !isConnected -> {
             HomeScreen(
-                uiState = uiState,
-                onConnect = viewModel::connect,
-                onClearError = viewModel::clearError,
                 modifier = Modifier.fillMaxSize()
             )
         }
 
         // Connected but no mode selected - show mode selection
-        uiState.mode == null -> {
+        mode == null -> {
             ModeSelectionScreen(
-                uiState = uiState,
+                displayName = user?.displayName ?: "User",
                 onSelectMode = viewModel::setMode,
                 onDisconnect = viewModel::disconnect,
                 modifier = Modifier.fillMaxSize()
@@ -78,21 +80,20 @@ fun AzureCommunicationApp(
         }
 
         // Chat mode selected
-        uiState.mode == CommunicationMode.CHAT -> {
-            if (uiState.threadId == null) {
+        mode == CommunicationMode.CHAT -> {
+            val currentUser = user
+            val currentThreadId = threadId
+
+            if (currentThreadId == null) {
                 // No thread yet - show chat setup
                 ChatSetupScreen(
-                    uiState = uiState,
-                    onCreateThread = viewModel::createChatThread,
-                    onJoinThread = viewModel::joinChatThread,
-                    onBack = { viewModel.setMode(CommunicationMode.CHAT).let { viewModel.leaveChat() } },
-                    onClearError = viewModel::clearError,
                     modifier = Modifier.fillMaxSize()
                 )
-            } else {
+            } else if (currentUser != null) {
                 // Have thread - show chat
                 ChatScreen(
-                    uiState = uiState,
+                    user = currentUser,
+                    threadId = currentThreadId,
                     onLeave = viewModel::leaveChat,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -100,20 +101,20 @@ fun AzureCommunicationApp(
         }
 
         // Video mode selected
-        uiState.mode == CommunicationMode.VIDEO -> {
-            if (uiState.groupId == null) {
+        mode == CommunicationMode.VIDEO -> {
+            val currentUser = user
+            val currentGroupId = groupId
+
+            if (currentGroupId == null) {
                 // No group yet - show call setup
                 CallSetupScreen(
-                    uiState = uiState,
-                    onCreateCall = viewModel::createGroupCall,
-                    onJoinCall = viewModel::joinGroupCall,
-                    onBack = viewModel::leaveCall,
                     modifier = Modifier.fillMaxSize()
                 )
-            } else {
+            } else if (currentUser != null) {
                 // Have group - show calling screen
                 CallingScreen(
-                    uiState = uiState,
+                    user = currentUser,
+                    groupId = currentGroupId,
                     onLeave = viewModel::leaveCall,
                     modifier = Modifier.fillMaxSize()
                 )

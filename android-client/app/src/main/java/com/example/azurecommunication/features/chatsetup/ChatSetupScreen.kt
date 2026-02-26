@@ -1,4 +1,4 @@
-package com.example.azurecommunication.ui.screens
+package com.example.azurecommunication.features.chatsetup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,35 +18,47 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.azurecommunication.ui.viewmodel.AcsUiState
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CallSetupScreen(
-    uiState: AcsUiState,
-    onCreateCall: () -> Unit,
-    onJoinCall: (String) -> Unit,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
+fun ChatSetupScreen(
+    modifier: Modifier = Modifier,
+    viewModel: ChatSetupViewModel = hiltViewModel()
 ) {
-    var groupIdToJoin by rememberSaveable { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
+    var topic by rememberSaveable { mutableStateOf("") }
+    var threadIdToJoin by rememberSaveable { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { error ->
+            snackbarHostState.showSnackbar(error)
+            viewModel.clearError()
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Video Call Setup") },
+                title = { Text("Chat Setup") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = { viewModel.goBack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -54,6 +67,7 @@ fun CallSetupScreen(
                 }
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier
     ) { padding ->
         Column(
@@ -65,21 +79,34 @@ fun CallSetupScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Start New Call",
+                text = "Create New Chat",
                 style = MaterialTheme.typography.titleLarge
             )
 
-            Text(
-                text = "Create a new group call and share the ID with others to join",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            OutlinedTextField(
+                value = topic,
+                onValueChange = { topic = it },
+                label = { Text("Chat Topic") },
+                placeholder = { Text("Enter chat topic (optional)") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isLoading
             )
 
             Button(
-                onClick = onCreateCall,
+                onClick = { viewModel.createChatThread(topic.ifBlank { "Chat" }) },
+                enabled = !uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Start New Call")
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.height(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Create New Chat")
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -93,25 +120,33 @@ fun CallSetupScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Join Existing Call",
+                text = "Join Existing Chat",
                 style = MaterialTheme.typography.titleLarge
             )
 
             OutlinedTextField(
-                value = groupIdToJoin,
-                onValueChange = { groupIdToJoin = it },
-                label = { Text("Group ID") },
-                placeholder = { Text("Enter group ID to join") },
+                value = threadIdToJoin,
+                onValueChange = { threadIdToJoin = it },
+                label = { Text("Thread ID") },
+                placeholder = { Text("Enter thread ID to join") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isLoading
             )
 
             OutlinedButton(
-                onClick = { onJoinCall(groupIdToJoin) },
-                enabled = groupIdToJoin.isNotBlank(),
+                onClick = { viewModel.joinChatThread(threadIdToJoin) },
+                enabled = !uiState.isLoading && threadIdToJoin.isNotBlank(),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Join Call")
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.height(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Join Chat")
+                }
             }
         }
     }

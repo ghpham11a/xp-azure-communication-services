@@ -1,4 +1,4 @@
-package com.example.azurecommunication.ui.theme
+package com.example.azurecommunication.shared.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

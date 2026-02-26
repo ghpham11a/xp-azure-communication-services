@@ -1,26 +1,25 @@
 package com.example.azurecommunication.data.repository
 
-import com.example.azurecommunication.data.api.NetworkModule
+import com.example.azurecommunication.data.api.AcsApiService
 import com.example.azurecommunication.data.models.AcsUser
 import com.example.azurecommunication.data.models.CreateThreadRequest
 import com.example.azurecommunication.data.models.JoinThreadRequest
 import com.example.azurecommunication.data.models.TokenRequest
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AcsRepository {
-    private val api = NetworkModule.acsApiService
-
+@Singleton
+class AcsRepository @Inject constructor(
+    private val api: AcsApiService
+) {
     suspend fun getAcsToken(displayName: String): Result<AcsUser> {
-        return try {
+        return runCatching {
             val response = api.createToken(TokenRequest(displayName))
-            Result.success(
-                AcsUser(
-                    userId = response.userId,
-                    token = response.token,
-                    displayName = displayName
-                )
+            AcsUser(
+                userId = response.userId,
+                token = response.token,
+                displayName = displayName
             )
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
 
@@ -29,7 +28,7 @@ class AcsRepository {
         displayName: String,
         topic: String = "Chat"
     ): Result<String> {
-        return try {
+        return runCatching {
             val response = api.createChatThread(
                 CreateThreadRequest(
                     userId = userId,
@@ -37,9 +36,7 @@ class AcsRepository {
                     topic = topic
                 )
             )
-            Result.success(response.threadId)
-        } catch (e: Exception) {
-            Result.failure(e)
+            response.threadId
         }
     }
 
@@ -48,7 +45,7 @@ class AcsRepository {
         userId: String,
         displayName: String
     ): Result<Unit> {
-        return try {
+        return runCatching {
             api.joinChatThread(
                 threadId = threadId,
                 request = JoinThreadRequest(
@@ -56,9 +53,7 @@ class AcsRepository {
                     displayName = displayName
                 )
             )
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+            Unit
         }
     }
 }
