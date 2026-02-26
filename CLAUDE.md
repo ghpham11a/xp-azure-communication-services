@@ -50,7 +50,7 @@ Requires Xcode 15+, iOS 17.0+ deployment target. Uses CocoaPods for ACS SDKs.
 ### Tunneling for mobile testing
 
 ```bash
-ngrok http --hostname=feedback-test.ngrok.io 6969
+ngrok http --hostname=<your-hostname>.ngrok.io <your-port>
 ```
 
 ## Architecture
