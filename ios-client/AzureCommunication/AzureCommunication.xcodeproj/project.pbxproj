@@ -45,7 +45,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		CEC45F922F2A90B100BF3C98 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		CEC45F922F2A90B100BF3C98 /* Exceptions for "AzureCommunication" folder in "AzureCommunication" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -58,22 +58,18 @@
 		CEC45F922F2A90B100BF3C99 /* AzureCommunication */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				CEC45F922F2A90B100BF3C98 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+				CEC45F922F2A90B100BF3C98 /* Exceptions for "AzureCommunication" folder in "AzureCommunication" target */,
 			);
 			path = AzureCommunication;
 			sourceTree = "<group>";
 		};
 		CEC45FA02F2A90B200BF3C99 /* AzureCommunicationTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = AzureCommunicationTests;
 			sourceTree = "<group>";
 		};
 		CEC45FAA2F2A90B200BF3C99 /* AzureCommunicationUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = AzureCommunicationUITests;
 			sourceTree = "<group>";
 		};
@@ -117,7 +113,6 @@
 				A4E20648E3602DA2C53ED977 /* Pods-AzureCommunicationTests.debug.xcconfig */,
 				6862AB6096CAE8CD6B064E20 /* Pods-AzureCommunicationTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -322,9 +317,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AzureCommunication/Pods-AzureCommunication-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AzureCommunication/Pods-AzureCommunication-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -383,9 +382,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AzureCommunication-AzureCommunicationUITests/Pods-AzureCommunication-AzureCommunicationUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AzureCommunication-AzureCommunicationUITests/Pods-AzureCommunication-AzureCommunicationUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

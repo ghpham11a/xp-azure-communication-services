@@ -51,12 +51,14 @@ PODS:
     - MicrosoftFluentUI/Separator_ios
   - MicrosoftFluentUI/TouchForwardingView_ios (0.10.0):
     - MicrosoftFluentUI/Core_ios
+  - Swinject (2.9.1)
   - Trouter (0.2.0)
 
 DEPENDENCIES:
   - AzureCommunicationChat
   - AzureCommunicationCommon
   - AzureCommunicationUICalling
+  - Swinject
 
 SPEC REPOS:
   trunk:
@@ -66,6 +68,7 @@ SPEC REPOS:
     - AzureCommunicationUICalling
     - AzureCore
     - MicrosoftFluentUI
+    - Swinject
     - Trouter
 
 SPEC CHECKSUMS:
@@ -75,8 +78,9 @@ SPEC CHECKSUMS:
   AzureCommunicationUICalling: 79724e11a7af8088057d375e97d8f79d03febed8
   AzureCore: ebbf7cf4dfe72afc7584088c38d1c99f5a35d647
   MicrosoftFluentUI: f6db695718efb93f4ca9bdc366c00b80a1f91dba
+  Swinject: a827d508c6270da03ec74e558e728917a888fa9b
   Trouter: 7eab36954ad740e32db3ff9f6025b0dff92193d7
 
-PODFILE CHECKSUM: 10d356047dbc74bdb8f960ab5a808ca94592f213
+PODFILE CHECKSUM: eeb503fd6abc0521b6225829f1ee983f9344f376
 
 COCOAPODS: 1.16.2

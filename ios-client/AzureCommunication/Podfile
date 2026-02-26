@@ -9,6 +9,7 @@ target 'AzureCommunication' do
   pod 'AzureCommunicationCommon'      # Shared types (CommunicationTokenCredential)
   pod 'AzureCommunicationChat'        # Chat SDK
   pod 'AzureCommunicationUICalling'   # Video calling UI composite
+  pod 'Swinject'                      # Dependency injection
 
   target 'AzureCommunicationTests' do
     inherit! :search_paths

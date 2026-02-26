@@ -34,6 +34,17 @@
         <string>audio</string>
         <string>voip</string>
     </array>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>com.ap.AzureCommunication</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>azcomms</string>
+            </array>
+        </dict>
+    </array>
     <key>UILaunchScreen</key>
     <dict/>
     <key>UIRequiredDeviceCapabilities</key>

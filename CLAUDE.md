@@ -77,14 +77,16 @@ Jetpack Compose with MVVM architecture:
 
 ### iOS App
 
-SwiftUI with MVVM architecture:
+SwiftUI with MVVM architecture, Swinject DI, `@Observable` macro:
 
-- **AzureCommunicationApp.swift** - Entry point
-- **ContentView.swift** - Root navigation based on state
-- **ViewModels/AcsViewModel.swift** - ObservableObject state management (requires `import Combine`)
-- **Views/** - SwiftUI screens: Home, ModeSelection, ChatSetup, Chat, CallSetup, Calling
-- **Data/API/AcsApiService.swift** - URLSession async/await API calls
-- **Data/Repository/AcsRepository.swift** - Data layer
+- **AzureCommunicationApp.swift** - Entry point, injects `SharedState` environment
+- **ContentView.swift** - Root navigation, resolves ViewModels from DI container
+- **DI/DependencyContainer.swift** - Swinject singleton registering all dependencies
+- **Core/SharedState.swift** - `@Observable` cross-cutting session state (user, mode, threadId, groupId)
+- **Core/Networking/** - Protocol-based networking: `Networking` protocol, `NetworkService` (URLSession), `Endpoint` protocol, `NetworkError`
+- **Features/** - Co-located screens + ViewModels per feature: `Home/`, `ModeSelection/`, `Chat/`, `Calling/`
+- **Data/Endpoints/** - Typed endpoint structs: `TokenEndpoints`, `ChatEndpoints`
+- **Data/Repositories/** - Protocol + implementation per domain: `TokensRepo`/`TokensRepository`, `ChatRepo`/`ChatRepository`
 - **Data/Models/AcsModels.swift** - Codable models
 - **Config/AcsConfig.swift** - ACS endpoint configuration
 - **Utilities/PermissionManager.swift** - Camera/microphone permissions
